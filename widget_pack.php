@@ -13,39 +13,18 @@
 <?php 
 
 
-/*function wp_comment_count( ){
-    $post_id = get_queried_object_id();
-        $comment_count = get_post_field( 'post_author', $post_id );
-return $comment_count;
-}
 
- function wp_show_comment($post_count){
-    $comment_count= wp_comment_count();
-                                
 
-    $auth_list=new WP_Query(
-            array(
-                'author'=>$comment_count,
-                "posts_per_page" => $post_count,
-                "meta_key" => "asc_views",
-                "orderby"=>'meta_value_num',
-                "order" => "DESC"
-            ));
-    if($auth_list->have_posts()){
-       // echo '<a href="'.get_author_posts_url(get_the_author_meta( 'ID' )).'">'.get_the_author_meta( 'user_firstname', $auth_id)." ".get_the_author_meta( 'user_lastname', $auth_id).'</a>'."<br>".get_the_author_meta('description',$auth_id);
-        while ( $auth_list->have_posts() ) : $auth_list->the_post();
-            echo "<div class='auth-post-list'>";         
-            echo '<a href="'.get_permalink().'">'.the_title('', '', false).'</a>'.'<br>';
-            echo comments_number();
-            
-            echo "</div>";
-        endwhile;
-         
-    }
-   // echo '<a href="'.get_author_posts_url($auth_id).'">'.get_the_author_meta( 'description', $auth_id).'</a>';
-}*/
+add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 
-function wp_get_comment_count(){
+
+function prefix_add_my_stylesheet() {
+    // Respects SSL, Style.css is relative to the current file
+    wp_register_style( 'prefix-style', plugins_url('recent.css', __FILE__) );
+    wp_enqueue_style( 'prefix-style' );
+}?>
+<?php   
+    function wp_get_comment_count(){
     global $count;
     $count= comment_number() ;
     return $count;
@@ -53,8 +32,6 @@ function wp_get_comment_count(){
 
     
    
-    
-   // echo '<a href="'.get_author_posts_url($auth_id).'">'.get_the_author_meta( 'description', $auth_id).'</a>';
 
  
 

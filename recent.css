@@ -1,0 +1,10 @@
+.comments{
+    border: 2px solid blue;
+     margin-bottom: 20px;
+}
+.widget-title{
+    text-align: center;
+}
+.hr{
+    border-top: 3px solid #428bca !important;
+}
