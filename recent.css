@@ -1,10 +1,20 @@
 .comments{
-    border: 2px solid blue;
+    border: 2px solid gray;
      margin-bottom: 20px;
 }
 .widget-title{
     text-align: center;
 }
-.hr{
-    border-top: 3px solid #428bca !important;
+.comments li{
+    list-style: none;
+}
+.comments img{
+    border-radius: 5px;
+}
+.combine{
+    width: 100%;
+}
+.avatar{
+    float:left;
+    margin-right:5px;
 }
