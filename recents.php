@@ -76,8 +76,8 @@ class Recent_Comments extends WP_Widget {
                              }
                              
                              if($instance['checkbox_3']){
-                                 
-                                 $id = get_comment( get_comment_ID() )->user_id;
+                                 $var= get_comment_ID();
+                                 $id = get_comment($var);
                                  $image=get_avatar($id,'32');
                                   
                              }

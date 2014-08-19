@@ -24,11 +24,11 @@ function prefix_add_my_stylesheet() {
     wp_enqueue_style( 'prefix-style' );
 }?>
 <?php   
-    function wp_get_comment_count(){
+   /* function wp_get_comment_count(){
     global $count;
     $count= comment_number() ;
     return $count;
-}
+}*/
 
     
    
