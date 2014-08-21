@@ -11,13 +11,11 @@ class Recent_Comments extends WP_Widget {
 		if ( is_active_widget(false, false, $this->id_base) )
 			add_action( 'wp_head', array($this, 'recent_comments_style') );
 
-		add_action( 'comment_post', array($this, 'flush_widget_cache') );
-		add_action( 'edit_comment', array($this, 'flush_widget_cache') );
-		add_action( 'transition_comment_status', array($this, 'flush_widget_cache') );
+		
 	}
 
 	function recent_comments_style() {
-		if ( ! current_theme_supports( 'widgets' ) // Temp hack #14876
+		if ( ! current_theme_supports( 'widgets' ) 
 			|| ! apply_filters( 'show_recent_comments_widget_style', true, $this->id_base ) )
 			return;
 		?>
@@ -25,12 +23,9 @@ class Recent_Comments extends WP_Widget {
 <?php
 	}
 
-	/*function flush_widget_cache() {
-		wp_cache_delete('widget_recent_comments', 'widget');
-	}*/
-
+	
 	function widget( $args, $instance ) {
-		global $comments, $comment;
+		global $comments, $comment,$posttitle,$image;
 
 		echo '<div class="comments">';
                  
@@ -53,29 +48,26 @@ class Recent_Comments extends WP_Widget {
                
                 
 		if ( $comments ) {
-			// Prime cache for associated posts. (Prime post term cache if we need it for permalinks.)
-			$post_ids = array_unique( wp_list_pluck( $comments, 'comment_post_ID' ) );
-			_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
-                       
+			
 
 			foreach ( (array) $comments as $comment) {
-                            /*if($instance['checkbox_2']){
+                           
+                            if($instance['post_title']){
                                
-                            $com=get_comment_text();}*/
-                             if($instance['checkbox_1']){
                                
-                                // echo "on";
+                                 global $posttitle,$com;
                              $posttitle=get_the_title($comment->comment_post_ID);
                              }
                            echo '<div class="combine">';
                              
-                             if($instance['checkbox_2']){
+                             if($instance['comment_text']){
                                echo '<div class="text">';
                             $com=get_comment_text();
                             echo '</div>';
                              }
                              
-                             if($instance['checkbox_3']){
+                             if($instance['com_avatar']){
+                                
                                  $var= get_comment_ID();
                                  $id = get_comment($var);
                                  $image=get_avatar($id,'32');
@@ -83,36 +75,35 @@ class Recent_Comments extends WP_Widget {
                              }
                             
                            echo "</div>";
-                            $output .=  '<li class="recentcomments">' . /*translators: comments widget: 1: comment author, 2: post link*/  sprintf(_x('<br><br> %1$s on %2$s <br>  %3$s %4$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . $posttitle . '</a>' ,'<div class="combine"><div class="avatar">'.$image .'</div>','<div class="text">'.$com.'</div></div>') . '</li>';
-                                //$output .=  '<li class="recentcomments">' . /*translators: comments widget: 1: comment author, 2: post link*/  sprintf(_x('%1$s on %2$s <br> %3$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . get_the_title($comment->comment_post_ID) . '</a>',get_comment_text()) . '</li>';
+                            $output .=  '<li class="recentcomments">' .  sprintf(_x('<br><br> %1$s on %2$s <br>  %3$s %4$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . $posttitle. '</a>' ,'<div class="combine"><div class="avatar">'.$image .'</div>','<div class="text">'.$com.'</div></div>') . '</li>';
+                                
 			}
- 		}
-		//$output .= '</ul>';
+ 		} 
+                echo '</ul>';
+		
 		$output .= $after_widget;
 
 		echo $output;
-		$cache[$args['widget_id']] = $output;
-		wp_cache_set('widget_recent_comments', $cache, 'widget');
+		
 	}
         
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['number'] = absint( $new_instance['number'] );
-		//$this->flush_widget_cache();
+		
 
-		$alloptions = wp_cache_get( 'alloptions', 'options' );
-		if ( isset($alloptions['widget_recent_comments']) )
-			delete_option('widget_recent_comments');
+		
                 
-                 $instance['checkbox_1']=strip_tags($new_instance['checkbox_1']);
-                  $instance['checkbox_2']=strip_tags($new_instance['checkbox_2']);
-                  $instance['checkbox_3']=strip_tags($new_instance['checkbox_3']);
+                 $instance['post_title']=strip_tags($new_instance['post_title']);
+                  $instance['comment_text']=strip_tags($new_instance['comment_text']);
+                  $instance['com_avatar']=strip_tags($new_instance['com_avatar']);
 
 		return $instance;
 	}
 
 	function form( $instance ) {
+                 $defaults=array('title'=>'Recent Comments','comment_text'=>'0','number'=>__('5'),'com_avatar'=>'0','post_title'=>'0');
 		$title  = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
 		$number = isset( $instance['number'] ) ? absint( $instance['number'] ) : 5;
 ?>
@@ -122,17 +113,17 @@ class Recent_Comments extends WP_Widget {
 		<p><label for="<?php echo $this->get_field_id( 'number' ); ?>"><?php _e( 'Number of comments to show:' ); ?></label>
 		<input id="<?php echo $this->get_field_id( 'number' ); ?>" name="<?php echo $this->get_field_name( 'number' ); ?>" type="text" value="<?php echo $number; ?>" size="3" /></p>
            <p>
-                <input class="checkbox" type="checkbox" <?php checked($instance['checkbox_1'], 'on'); ?> id="<?php echo $this->get_field_id('checkbox_1'); ?>" name="<?php echo $this->get_field_name('checkbox_1'); ?>" /> 
-                <label for="<?php echo $this->get_field_id('checkbox_1'); ?>">Display post-title</label>
+                <input class="checkbox" type="checkbox" <?php checked($instance['post_title'], 'on'); ?> id="<?php echo $this->get_field_id('post_title'); ?>" name="<?php echo $this->get_field_name('post_title'); ?>" /> 
+                <label for="<?php echo $this->get_field_id('post_title'); ?>">Display post-title</label>
         </p>
         
         <p>
-                <input class="checkbox" type="checkbox" <?php checked($instance['checkbox_2'], 'on'); ?> id="<?php echo $this->get_field_id('checkbox_2'); ?>" name="<?php echo $this->get_field_name('checkbox_2'); ?>" /> 
-                <label for="<?php echo $this->get_field_id('checkbox_2'); ?>">Display comment-text</label>
+                <input class="checkbox" type="checkbox" <?php checked($instance['comment_text'], 'on'); ?> id="<?php echo $this->get_field_id('comment_text'); ?>" name="<?php echo $this->get_field_name('comment_text'); ?>" /> 
+                <label for="<?php echo $this->get_field_id('comment_text'); ?>">Display comment-text</label>
         </p>
          <p>
-                <input class="checkbox" type="checkbox" <?php checked($instance['checkbox_3'], 'on'); ?> id="<?php echo $this->get_field_id('checkbox_3'); ?>" name="<?php echo $this->get_field_name('checkbox_3'); ?>" /> 
-                <label for="<?php echo $this->get_field_id('checkbox_3'); ?>">Display commenter's gravatar</label>
+                <input class="checkbox" type="checkbox" <?php checked($instance['com_avatar'], 'on'); ?> id="<?php echo $this->get_field_id('com_avatar'); ?>" name="<?php echo $this->get_field_name('com_avatar'); ?>" /> 
+                <label for="<?php echo $this->get_field_id('com_avatar'); ?>">Display commenter's gravatar</label>
         </p>
        <?php 
 	}

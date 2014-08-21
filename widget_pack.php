@@ -19,16 +19,12 @@ add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 
 
 function prefix_add_my_stylesheet() {
-    // Respects SSL, Style.css is relative to the current file
+   
     wp_register_style( 'prefix-style', plugins_url('recent.css', __FILE__) );
     wp_enqueue_style( 'prefix-style' );
 }?>
 <?php   
-   /* function wp_get_comment_count(){
-    global $count;
-    $count= comment_number() ;
-    return $count;
-}*/
+   
 
     
    
